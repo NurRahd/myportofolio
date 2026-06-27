@@ -89,6 +89,9 @@ function throwIfError(result) {
 // ─── API object ────────────────────────────────────────────────────────────────
 
 export const api = {
+  // ── File Upload (exposed for components) ──────────────────────────────────
+  uploadFileToStorage: uploadFile,
+
   // ── Auth (Supabase Auth) ──────────────────────────────────────────────────
   login: async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });

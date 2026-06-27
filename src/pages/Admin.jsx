@@ -140,6 +140,7 @@ function ProfileSection({ showToast }) {
 function SocialLinksSection({ showToast }) {
   const [links, setLinks] = useState([]);
   const [editing, setEditing] = useState(null);
+  const [iconFile, setIconFile] = useState(null);
   const [confirm, setConfirm] = useState(null);
   const empty = { platform: '', label: '', value: '', href: '', iconType: 'image', iconName: '', iconImage: '', order: 0 };
 
@@ -147,14 +148,19 @@ function SocialLinksSection({ showToast }) {
 
   const save = async () => {
     try {
+      const payload = { ...editing };
+      if (iconFile && editing.iconType === 'image') {
+        payload.iconImage = await api.uploadFileToStorage(iconFile);
+      }
       if (editing.id) {
-        const updated = await api.updateSocialLink(editing.id, editing);
+        const updated = await api.updateSocialLink(editing.id, payload);
         setLinks((l) => l.map((x) => x.id === editing.id ? updated : x));
       } else {
-        const created = await api.createSocialLink(editing);
+        const created = await api.createSocialLink(payload);
         setLinks((l) => [...l, created]);
       }
       setEditing(null);
+      setIconFile(null);
       showToast('Social link saved!');
     } catch (err) { showToast(err.message, 'error'); }
   };
@@ -172,7 +178,7 @@ function SocialLinksSection({ showToast }) {
     <div className="adm-section">
       <div className="adm-section-header">
         <h2>Social Links</h2>
-        <button className="adm-btn adm-btn--primary" onClick={() => setEditing({ ...empty })}>+ Add Link</button>
+        <button className="adm-btn adm-btn--primary" onClick={() => { setEditing({ ...empty }); setIconFile(null); }}>+ Add Link</button>
       </div>
       <table className="adm-table">
         <thead><tr><th>Platform</th><th>Label</th><th>Value</th><th>Icon</th><th>Actions</th></tr></thead>
@@ -182,9 +188,9 @@ function SocialLinksSection({ showToast }) {
               <td>{item.platform}</td>
               <td>{item.label}</td>
               <td><a href={item.href} target="_blank" rel="noreferrer">{item.value}</a></td>
-              <td>{item.iconType === 'lucide' ? `Lucide: ${item.iconName}` : `Image: ${item.iconImage}`}</td>
+              <td>{item.iconType === 'lucide' ? `Lucide: ${item.iconName}` : <ImagePreview src={item.iconImage} size={24} />}</td>
               <td className="adm-td-actions">
-                <button className="adm-btn adm-btn--sm" onClick={() => setEditing({ ...item })}>Edit</button>
+                <button className="adm-btn adm-btn--sm" onClick={() => { setEditing({ ...item }); setIconFile(null); }}>Edit</button>
                 <button className="adm-btn adm-btn--sm adm-btn--danger" onClick={() => setConfirm(item.id)}>Del</button>
               </td>
             </tr>
@@ -202,18 +208,26 @@ function SocialLinksSection({ showToast }) {
               ))}
               <label>Icon Type
                 <select value={editing.iconType} onChange={(e) => setEditing((x) => ({ ...x, iconType: e.target.value }))}>
-                  <option value="image">Image file</option>
+                  <option value="image">Upload gambar</option>
                   <option value="lucide">Lucide icon</option>
                 </select>
               </label>
               {editing.iconType === 'lucide'
-                ? <label>Lucide Icon Name<input value={editing.iconName || ''} onChange={(e) => setEditing((x) => ({ ...x, iconName: e.target.value }))} placeholder="Mail, Github…" /></label>
-                : <label>Icon Image Filename<input value={editing.iconImage || ''} onChange={(e) => setEditing((x) => ({ ...x, iconImage: e.target.value }))} placeholder="instagramblue.png" /></label>
+                ? <label>Lucide Icon Name<input value={editing.iconName || ''} onChange={(e) => setEditing((x) => ({ ...x, iconName: e.target.value }))} placeholder="Mail, Github..." /></label>
+                : <label>Upload Icon (PNG/SVG/WebP)
+                    <input type="file" accept="image/*" onChange={(e) => setIconFile(e.target.files[0])} />
+                    {editing.iconImage && !iconFile && (
+                      <div style={{ marginTop: 6 }}>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--a-muted)' }}>Icon saat ini:</span>
+                        <ImagePreview src={editing.iconImage} size={32} />
+                      </div>
+                    )}
+                  </label>
               }
             </div>
             <div className="adm-actions">
               <button className="adm-btn adm-btn--primary" onClick={save}>Save</button>
-              <button className="adm-btn" onClick={() => setEditing(null)}>Cancel</button>
+              <button className="adm-btn" onClick={() => { setEditing(null); setIconFile(null); }}>Cancel</button>
             </div>
           </div>
         </div>
