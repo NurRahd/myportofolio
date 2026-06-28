@@ -116,7 +116,14 @@ export default function About() {
       });
       setExperiences(sortedExp);
       setEducation(edu);
-      setCertificates(certs);
+
+      const sortedCerts = [...certs].sort((a, b) => {
+        const timeA = Date.parse(a.issued) || 0;
+        const timeB = Date.parse(b.issued) || 0;
+        return timeB - timeA;
+      });
+      setCertificates(sortedCerts);
+
       setActivities(acts);
       setLoading(false);
     }).catch((err) => {
