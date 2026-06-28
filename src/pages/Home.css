@@ -426,7 +426,15 @@
 
 @media (max-width: 620px) {
   .hero { padding-top: 108px; }
-  .hero-art { display: none; }
+  .hero-art { 
+    display: block; 
+    height: 320px; 
+    min-height: 320px;
+    margin-top: 24px;
+    transform: translateX(0);
+  }
+  .hero-photo { right: 5%; width: 90%; bottom: 10px; }
+  .hero-photo-wash { right: 0; width: 100%; bottom: 0; }
   .featured-grid { grid-template-columns: 1fr; }
   .section-header { align-items: flex-start; flex-direction: column; }
 }
