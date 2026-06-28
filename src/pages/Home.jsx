@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart, ExternalLink } from 'lucide-react';
+import { ArrowRight, Heart, ExternalLink, X } from 'lucide-react';
 import collage from '../assets/portfolio-collage.png';
 import myFoto from '../assets/myfoto.png';
 import bgHero from '../assets/bghero.png';
@@ -14,6 +14,7 @@ import leaveImg from '../assets/leave.png';
 import logoGithub from '../assets/github.svg';
 import { api, imageUrl } from '../lib/api';
 import './Home.css';
+import './Projects.css';
 
 function resolveImg(src) {
   if (!src) return collage;
@@ -75,6 +76,31 @@ function TypeWriter({ words, typingSpeed = 90, deletingSpeed = 55, pauseMs = 180
 export default function Home() {
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [profile, setProfile] = useState({});
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [modalSlide, setModalSlide] = useState(0);
+
+  const openModal = (project) => {
+    setSelectedProject(project);
+    setModalSlide(0);
+  };
+
+  useEffect(() => {
+    if (!selectedProject) return undefined;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedProject(null);
+      if (e.key === 'ArrowRight') setModalSlide((p) => (p + 1) % Math.max(1, selectedProject.images?.length || 1));
+      if (e.key === 'ArrowLeft') setModalSlide((p) => (p - 1 + Math.max(1, selectedProject.images?.length || 1)) % Math.max(1, selectedProject.images?.length || 1));
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', handleKeyDown); };
+  }, [selectedProject]);
+
+  const getImages = (project) => {
+    if (project.images && project.images.length > 0) return project.images;
+    if (project.image) return [{ id: 0, src: project.image, pos: project.pos }];
+    return [];
+  };
 
   // Parse rotating words from profile, fallback to default
   const rotatingWords = profile.hero_rotating_words
@@ -154,14 +180,14 @@ export default function Home() {
 
           <div className="featured-grid">
             {featuredProjects.map((project) => (
-              <article className="project-card card" key={project.id}>
+              <article className="project-card card" key={project.id} onClick={() => openModal(project)} style={{ cursor: 'pointer' }}>
                 <div className="project-thumb">
-                  <img src={resolveImg(project.image)} alt="" className="asset-crop" style={{ '--pos': project.pos }} />
+                  <img src={resolveImg(project.images?.[0]?.src || project.image)} alt="" className="asset-crop" style={{ '--pos': project.images?.[0]?.pos || project.pos }} />
                 </div>
                 <div className="project-info">
                   <div className="proj-header">
                     <h3>{project.title}</h3>
-                    <div className="proj-links">
+                    <div className="proj-links" onClick={(e) => e.stopPropagation()}>
                       {project.github && (
                         <a href={project.github} target="_blank" rel="noopener noreferrer" className="proj-link-icon" title="GitHub Repository">
                           <img src={logoGithub} alt="GitHub" className="proj-link-img" />
@@ -196,6 +222,70 @@ export default function Home() {
           <Link to="/contact" className="btn-outline">Let's Talk</Link>
         </div>
       </section>
+
+      {selectedProject && (() => {
+        const imgs = getImages(selectedProject);
+        const cur = imgs[modalSlide] || imgs[0];
+        return (
+          <div className="modal-overlay" onClick={() => setSelectedProject(null)}
+            role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <div className="modal-content modal-content--activity" onClick={(e) => e.stopPropagation()}>
+              <button className="modal-close" onClick={() => setSelectedProject(null)} aria-label="Close modal">
+                <X size={20} />
+              </button>
+              <div className="modal-body-layout">
+                <div className="activity-modal-img-wrap">
+                  <img
+                    className="activity-modal-img"
+                    src={resolveImg(cur?.src)}
+                    alt=""
+                  />
+                  {imgs.length > 1 && (
+                    <>
+                      <button type="button" className="activity-nav prev" aria-label="Previous image"
+                        onClick={() => setModalSlide((p) => (p - 1 + imgs.length) % imgs.length)}>
+                        {'<'}
+                      </button>
+                      <button type="button" className="activity-nav next" aria-label="Next image"
+                        onClick={() => setModalSlide((p) => (p + 1) % imgs.length)}>
+                        {'>'}
+                      </button>
+                      <div className="activity-dots">
+                        {imgs.map((_, i) => (
+                          <button type="button" key={i} className={i === modalSlide ? 'active' : ''}
+                            onClick={() => setModalSlide(i)} aria-label={`Go to slide ${i + 1}`} />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+                <div className="modal-text-content">
+                  <h2 id="modal-title" className="modal-title">{selectedProject.title}</h2>
+                  <p className="activity-date">{selectedProject.cat}</p>
+                  <p className="activity-desc">{selectedProject.desc}</p>
+                  <div className="activity-tags">
+                    {selectedProject.tags?.map((tag) => <span className="chip" key={tag}>{tag}</span>)}
+                  </div>
+                  {(selectedProject.demo || selectedProject.github) && (
+                    <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+                      {selectedProject.demo && (
+                        <a href={selectedProject.demo} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ minHeight: '36px', padding: '0 16px', fontSize: '0.85rem' }}>
+                          Visit Site <ExternalLink size={14} style={{ marginLeft: '6px' }} />
+                        </a>
+                      )}
+                      {selectedProject.github && (
+                        <a href={selectedProject.github} target="_blank" rel="noopener noreferrer" className="btn-outline" style={{ minHeight: '36px', padding: '0 16px', fontSize: '0.85rem' }}>
+                          GitHub Repo
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
