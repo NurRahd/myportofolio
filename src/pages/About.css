@@ -668,6 +668,32 @@
   }
 
   .about-hero-art {
+    display: block;
+    height: 320px;
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .about-photo-card {
+    position: relative;
+    right: auto;
+    top: auto;
+    width: 220px;
+    height: 270px;
+  }
+
+  .about-flower {
+    --w: 140px;
+    left: 10%;
+  }
+
+  .about-flower-cluster {
+    --w: 120px;
+    right: 10%;
+  }
+
+  .about-paper {
     display: none;
   }
 
