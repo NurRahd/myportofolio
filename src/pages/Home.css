@@ -441,6 +441,8 @@
   }
   .hero-photo { right: 5%; width: 90%; bottom: 0; }
   .hero-photo-wash { right: 0; width: 100%; bottom: 0; }
+  .hero-flower-a { --w: 140px; right: -2%; bottom: 5%; }
+  .hero-flower-b { --w: 120px; left: 2%; bottom: 15%; }
   .featured-grid { grid-template-columns: 1fr; }
   .section-header { align-items: flex-start; flex-direction: column; }
 }
