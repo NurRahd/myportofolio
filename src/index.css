@@ -774,6 +774,12 @@ main {
   border: 1px solid rgba(91, 157, 245, 0.22);
 }
 
+/* ── Project Link Icon (GitHub) ── */
+[data-theme="dark"] .proj-link-img {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+}
+
 /* ── Page hero fade edge ── */
 [data-theme="dark"] .page-hero::after,
 [data-theme="dark"] .section-wash::after {
