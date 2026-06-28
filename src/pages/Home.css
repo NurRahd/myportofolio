@@ -416,10 +416,16 @@
 @media (max-width: 980px) {
   .hero { min-height: auto; padding-bottom: 58px; }
   .hero-inner { grid-template-columns: 1fr; }
-  .hero-art { height: 430px; min-height: 430px; transform: none; }
+  .hero-art { height: 450px; min-height: 450px; transform: none; }
   .home-about { min-height: auto; }
   .about-preview { grid-template-columns: 1fr; gap: 34px; min-height: auto; transform: none; }
-  .about-visual { display: none; }
+  .about-visual { 
+    justify-self: center; 
+    margin-right: 0; 
+    margin-top: 24px; 
+    width: 280px; 
+    height: 380px; 
+  }
   .projects-heading-flower { display: none; }
   .featured-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -428,12 +434,12 @@
   .hero { padding-top: 108px; }
   .hero-art { 
     display: block; 
-    height: 320px; 
-    min-height: 320px;
+    height: 380px; 
+    min-height: 380px;
     margin-top: 24px;
     transform: translateX(0);
   }
-  .hero-photo { right: 5%; width: 90%; bottom: 10px; }
+  .hero-photo { right: 5%; width: 90%; bottom: 0; }
   .hero-photo-wash { right: 0; width: 100%; bottom: 0; }
   .featured-grid { grid-template-columns: 1fr; }
   .section-header { align-items: flex-start; flex-direction: column; }
