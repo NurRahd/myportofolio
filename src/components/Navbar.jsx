@@ -33,9 +33,7 @@ export default function Navbar() {
   return (
     <nav className={`navbar${scrolled ? ' scrolled' : ''}`}>
       <div className="navbar-inner container">
-        <Link to="/" className="navbar-logo">
-          <img src="/logo.png" alt="Rahd." className="logo-image" />
-        </Link>
+        <Link to="/" className="navbar-logo">Rahd.</Link>
         <ul className={`navbar-links${menuOpen ? ' open' : ''}`}>
           {links.map(l => (
             <li key={l}>
